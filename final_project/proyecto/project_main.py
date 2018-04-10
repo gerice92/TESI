@@ -4,6 +4,7 @@ from sklearn.metrics import precision_recall_fscore_support as pr
 import csv #package to work with tsv files
 import re #regex
 import numpy as np
+#np.set_printoptions(threshold='nan')
 
 #FUNCTION TO GET THE NUMBER OF SYLLABES IN WORD
 def syll_counter(word):
@@ -101,7 +102,7 @@ def getLines(path):
 def getMatrix(path):
     
     numExamples = getLines(path)
-
+    #numExamples = 100
     numFeatures = 9 #number of features
     matrix = np.empty(shape = [numExamples, numFeatures])
 
@@ -176,31 +177,38 @@ def getMatrix(path):
         vector_fet[8] = class_word
 
         matrix[indexRow]=vector_fet
+        
         indexRow += 1
-        if indexRow == 10:
+        if indexRow == numExamples:
             break
-
+        
     return matrix
 
 path='./data/Wikipedia_Train1.tsv'
 matrix_train=getMatrix(path)
-print(matrix_train)
+matrix_train = matrix_train.astype(int)
+#print(matrix_train)
 
 path='./data/Wikipedia_Dev1.tsv'
 #load_dataset(path)
 matrix_dev=getMatrix(path)
-print(matrix_dev)
+matrix_dev = matrix_dev.astype(int)
+#print(matrix_dev)
 
-numCol=matrix_train.shape[1]
-X_train=matrix_train[:,0:numCol-1]
+num_col = matrix_train.shape[1]
+X_train = matrix_train[:,0:num_col-1]
+y_train = matrix_train[:, -1] #last column
+print("X_train:\n")
 print(X_train)
-y_train=matrix_train[:, -1] #last column
+print("\ny_train:\n")
 print(y_train)
 
-numCol=matrix_dev.shape[1]
-X_dev=matrix_dev[:,0:numCol-1]
+num_col = matrix_dev.shape[1]
+X_dev = matrix_dev[:,0:num_col-1]
+y_dev = matrix_dev[:, -1] #last column
+print("X_dev:\n")
 print(X_dev)
-y_dev=matrix_dev[:, -1] #last column
+print("\ny_dev:\n")
 print(y_dev)
 
 #Array with possible algorithms
