@@ -1,8 +1,6 @@
-from __future__ import division
 from sklearn import svm
 from sklearn.metrics import precision_recall_fscore_support as pr
 import csv
-import re
 import numpy as np
 
 class WordClassifier(object):
@@ -52,12 +50,10 @@ class WordClassifier(object):
 
         # Count word appearances in the sentence
         num_ocurr = tokens.count(word)
-        
-        # Return -1 if no occurrences found
+
         if num_ocurr == 0:
             raise ValueError("word has no ocurrences in sentence")
-            
-        # Return -1 if start is outside sentence range
+
         if start < 0 or start >= len(sentence):
             raise ValueError("start is out of range of the sentence")
 
@@ -66,10 +62,11 @@ class WordClassifier(object):
         if num_ocurr == 1 or start == 0:
             index = tokens.index(word)
         else:
-            index = len(sentence[0:start-1].split(' ')) 
-            if index >= 0 and tokens[index] != word:
-                raise ValueError("word not found at start position")
+            index = len(sentence[0:start-1].split())
+            if tokens[index] != word:
+                raise ValueError("word ({}) not found at start position ({})".format(word, start))
 
+        # Prepare window values
         if index-1 >= 0:
             w_1 = tokens[index-1] 
             if index-2 >= 0:
@@ -85,14 +82,14 @@ class WordClassifier(object):
         """Return dictionary with n-grams frequencies from file"""
         
         dic = dict()
-        f = open(path, 'r')
-        for line in f:
-            line = line.strip()
-            pos = line.rfind(' ')
-            key = line[0:pos]
-            freq = line[pos+1:len(line)]
-            dic[key] = int(freq)
-        f.close()
+        with open(path, encoding='utf8', newline='\n') as f:
+            for line in f:
+                line = line.strip()
+                pos = line.rfind(' ')
+                key = line[0:pos]
+                freq = line[pos+1:len(line)]
+                dic[key] = int(freq)
+                
         return dic
 
     def _get_probability(self, ngram, dic, size):
@@ -118,9 +115,9 @@ class WordClassifier(object):
     def _get_lines(self, path):
         """Return number of lines in training set"""
         
-        f = open(path, 'r') 
-        num_examples = sum(1 for line in f)
-        f.close()
+        with open(path, encoding='utf8', newline='\n') as f:
+            num_examples = sum(1 for line in f)
+            
         return num_examples
 
     def _get_matrix(self, path):
@@ -133,79 +130,79 @@ class WordClassifier(object):
         # Load unigrams
         dic_path = self.WIKIPEDIA_1GRAM_PATH
         unigrams = self._load_dic(dic_path)
-        total_unigrams = sum(unigrams.itervalues())
+        total_unigrams = sum(iter(unigrams.values()))
 
         # Loag bigrams
         dic_path = self.WIKIPEDIA_2GRAM_PATH
         bigrams = self._load_dic(dic_path)
-        total_bigrams = sum(bigrams.itervalues())
+        total_bigrams = sum(iter(bigrams.values()))
 
         # Load trigrams
         dic_path = self.WIKIPEDIA_3GRAM_PATH
         trigrams = self._load_dic(dic_path)
-        total_trigrams = sum(trigrams.itervalues())
+        total_trigrams = sum(iter(trigrams.values()))
 
         # Parse dataset
-        tsvin = open(path, "rb")
-        tsvin = csv.reader(tsvin, delimiter="\t")
+        with open(path, encoding="utf8", newline='\n') as tsvin:
+            tsvin = csv.reader(tsvin, delimiter='\t')
 
-        indexRow = 0
-        for row in tsvin:
-            ide = row[0] # Paragraph ID
-            sentence = row[1] # Sentence
-            start = row[2] # Starting character index of word in sentence
-            end = row[3] # Ending character index of word in sentence
-            word = row[4] # Word to classify
-            classification = row[9] # Clasification: 0 means simple, 1 means complex
-            probability = row[10] # Word probability
+            indexRow = 0
+            for row in tsvin:
+                ide = row[0] # Paragraph ID
+                sentence = row[1] # Sentence
+                start = row[2] # Starting character index of word in sentence
+                end = row[3] # Ending character index of word in sentence
+                word = row[4] # Word to classify
+                classification = row[9] # Clasification: 0 means simple, 1 means complex
+                probability = row[10] # Word probability
             
-            len_word = len(word) # Word length
-            num_syl = self._count_syll(word) # Word number of syllables
-            len_sen = len(sentence) # Sentence length
-            w_2,w_1,w1,w2 = self._get_window(word, sentence, start) # Window
+                len_word = len(word) # Word length
+                num_syl = self._count_syll(word) # Word number of syllables
+                len_sen = len(sentence) # Sentence length
+                w_2,w_1,w1,w2 = self._get_window(word, sentence, start) # Window
 
-            # Left trigram probability
-            prob_2 = 0
-            trigramL = w_2 + ' ' + w_1 + ' ' + word
-            prob_2 = self._get_probability(trigramL, trigrams, total_trigrams)
+                # Left trigram probability
+                prob_2 = 0
+                trigramL = w_2 + ' ' + w_1 + ' ' + word
+                prob_2 = self._get_probability(trigramL, trigrams, total_trigrams)
             
-            # Left bigram probability
-            prob_1 = 0
-            bigramL = w_1 + ' ' + word
-            prob_1 = self._get_probability(bigramL, bigrams, total_bigrams)
+                # Left bigram probability
+                prob_1 = 0
+                bigramL = w_1 + ' ' + word
+                prob_1 = self._get_probability(bigramL, bigrams, total_bigrams)
         
-            # Unigram probability
-            prob = self._get_probability(word, unigrams, total_unigrams)
+                # Unigram probability
+                prob = self._get_probability(word, unigrams, total_unigrams)
         
-            # Right bigram probability
-            prob1 = 0
-            bigramR = word + ' ' + w1
-            prob1 = self._get_probability(bigramR, bigrams, total_bigrams)
+                # Right bigram probability
+                prob1 = 0
+                bigramR = word + ' ' + w1
+                prob1 = self._get_probability(bigramR, bigrams, total_bigrams)
         
-            # Right trigram probability
-            prob2 = 0
-            trigramR = word + ' ' + w1 + ' ' + w2
-            prob2 = self._get_probability(trigramR, trigrams, total_trigrams)
+                # Right trigram probability
+                prob2 = 0
+                trigramR = word + ' ' + w1 + ' ' + w2
+                prob2 = self._get_probability(trigramR, trigrams, total_trigrams)
 
-            # Prepare feature matrix for current example
-            vector_fet = np.arange(num_features)
-            vector_fet[0] = len_word
-            vector_fet[1] = num_syl
-            vector_fet[2] = len_sen
-            vector_fet[3] = prob_2
-            vector_fet[4] = prob_1
-            vector_fet[5] = prob
-            vector_fet[6] = prob1
-            vector_fet[7] = prob2
-            vector_fet[8] = classification
+                # Prepare feature matrix for current example
+                vector_fet = np.arange(num_features)
+                vector_fet[0] = len_word
+                vector_fet[1] = num_syl
+                vector_fet[2] = len_sen
+                vector_fet[3] = prob_2
+                vector_fet[4] = prob_1
+                vector_fet[5] = prob
+                vector_fet[6] = prob1
+                vector_fet[7] = prob2
+                vector_fet[8] = classification
 
-            # Store in global matrix
-            matrix[indexRow] = vector_fet
+                # Store in global matrix
+                matrix[indexRow] = vector_fet
         
-            # Continue until the matrix is filled
-            indexRow += 1
-            if indexRow == num_examples:
-                break
+                # Continue until the matrix is filled
+                indexRow += 1
+                if indexRow == num_examples:
+                    break
         
         return matrix
         
