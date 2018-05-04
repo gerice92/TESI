@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-class SynonymReplace(object):
+class WebLauncher(object):
     
     def __init__(self):
         return

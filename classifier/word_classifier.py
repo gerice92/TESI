@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 from sklearn import svm
 from sklearn.metrics import precision_recall_fscore_support
