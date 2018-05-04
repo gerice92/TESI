@@ -1,5 +1,8 @@
+#!/usr/bin/env python3
+
 from sklearn import svm
-from sklearn.metrics import precision_recall_fscore_support as pr
+from sklearn.metrics import precision_recall_fscore_support
+from sklearn.externals import joblib
 import csv
 import numpy as np
 
@@ -12,6 +15,8 @@ class WordClassifier(object):
         self.WIKIPEDIA_3GRAM_PATH = 'models/wiki_3.wngram'
         self.WIKIPEDIA_TRAIN_SET = 'data/wiki_train_1.tsv'
         self.WIKIPEDIA_EVAL_SET = 'data/wiki_eval_1.tsv'
+        self.ALGORITHM_SVM = 'svm'
+        self.CLASSIFIER_OUTPUT = 'classifiers.pkl'
 
     def _count_syll(self, word):
         """Return number of syllables for a given word
@@ -206,28 +211,26 @@ class WordClassifier(object):
         
         return matrix
         
-    def test_classifier(self):
+    def test_classifiers(self):
         """Print statistics for multiple classifiers"""
 
-        path = self.WIKIPEDIA_TRAIN_SET
-        matrix_train = self._get_matrix(path)
-        matrix_train = matrix_train.astype(int)
+        # Training set from Wikipedia.org samples
+        matrix_train = self._get_matrix(self.WIKIPEDIA_TRAIN_SET).astype(int)
 
-        path = self.WIKIPEDIA_EVAL_SET
-        matrix_dev = self._get_matrix(path)
-        matrix_dev = matrix_dev.astype(int)
+        # Evaluation set from Wikipedia.org samples
+        matrix_dev = self._get_matrix(self.WIKIPEDIA_EVAL_SET).astype(int)
 
-        # Training set
+        # Feature matrix for training set
         num_col = matrix_train.shape[1]
         X_train = matrix_train[:,0:num_col-1] # Feature array (all columns except last)
         y_train = matrix_train[:, -1] # Assigned class (last column)
 
-        # Evaluation set
+        # Feature matrix for evaluation set
         num_col = matrix_dev.shape[1]
         X_dev = matrix_dev[:,0:num_col-1] # Feature array (all columns except last)
         y_dev = matrix_dev[:, -1] # Assigned class (last column)
 
-        # Classification algorithms
+        # Classification algorithms to test
         classifiers = [svm.SVC()]
 
         # Compare classifiers
@@ -242,7 +245,26 @@ class WordClassifier(object):
             predicted = clf.predict(X_dev)
             
             # Precision, recall and f1 comparing expected classes with predicted classes
-            bPrecis, bRecall, bFscore, bSupport = pr(y_dev, predicted, average='binary')
+            bPrecis, bRecall, bFscore, bSupport = precision_recall_fscore_support(y_dev, predicted, average='binary')
             
             # Print statistics
             print(bPrecis, bRecall, bFscore, bSupport)
+
+    def train_classifier(self):
+        
+        # Training set from Wikipedia.org samples
+        matrix_train = self._get_matrix(self.WIKIPEDIA_TRAIN_SET).astype(int)
+        
+        # Training set
+        num_col = matrix_train.shape[1]
+        X_train = matrix_train[:,0:num_col-1] # Feature array (all columns except last)
+        y_train = matrix_train[:, -1] # Assigned class (last column)
+        
+        clf = svm.SVC()
+        clf.fit(X_train, y_train)
+        joblib.dump(clf, self.CLASSIFIER_OUTPUT)
+    
+    def classify(self, word):
+        
+        clf = joblib.load(self.CLASSIFIER_OUTPUT)
+        clf.predict()
