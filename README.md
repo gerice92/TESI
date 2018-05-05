@@ -3,7 +3,7 @@
 This repository contains the source code for the final project for TESI. The following dependencies are required for it to run as expected, assuming that **pip** is the preferred package manager for Python:
 
 ```bash
-pip install numpy scipy scikit-learn scrapy
+pip install numpy scipy scikit-learn scrapy nltk
 ```
 
 ## Architecture

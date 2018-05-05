@@ -1,22 +1,25 @@
 # -*- coding: utf-8 -*-
 
-from sklearn import svm
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import precision_recall_fscore_support
 from sklearn.externals import joblib
+from nltk.corpus import wordnet
 import csv
 import numpy as np
 
 class WordClassifier(object):
     
     def __init__(self):
-        self.NUM_FEATURES = 9
+        self.NUM_FEATURES = 10
         self.WIKIPEDIA_1GRAM_PATH = 'models/wiki_1.wngram'
         self.WIKIPEDIA_2GRAM_PATH = 'models/wiki_2.wngram'
         self.WIKIPEDIA_3GRAM_PATH = 'models/wiki_3.wngram'
         self.WIKIPEDIA_TRAIN_SET = 'data/wiki_train_1.tsv'
         self.WIKIPEDIA_EVAL_SET = 'data/wiki_eval_1.tsv'
-        self.ALGORITHM_SVM = 'svm'
-        self.CLASSIFIER_OUTPUT = 'classifiers.pkl'
+        self.ALGORITHM_SVM = 'svc'
+        self.CLASSIFIER_OUTPUT = 'classifier.pkl'
 
     def _count_syll(self, word):
         """Return number of syllables for a given word
@@ -28,6 +31,21 @@ class WordClassifier(object):
         syll = lambda w:len(''.join(c if c in "aeiouy" else ' ' for c in w.rstrip('e')).split())
         num_syl = syll(word)
         return num_syl
+        
+    def _count_syns(self, word):
+        """Return number of synonyms for a given word
+        
+        Keyword arguments:
+        word -- the word to calculate the number of synonyms for
+        """
+        
+        synonyms = []
+        
+        for synonym in wordnet.synsets(word):
+            for lemma in synonym.lemmas():
+                synonyms.append(lemma.name())
+                
+        return len(synonyms)
 
     def _get_window(self, word, sentence, start):
         """Return words surrounding a given word in a sentence, or -1 if not present
@@ -188,8 +206,10 @@ class WordClassifier(object):
                 prob2 = 0
                 trigramR = word + ' ' + w1 + ' ' + w2
                 prob2 = self._get_probability(trigramR, trigrams, total_trigrams)
+                
+                num_syn = self._count_syns(word) # Word number of synonyms
 
-                # Prepare feature matrix for current example
+                # Prepare feature matrix for current sample
                 vector_fet = np.arange(num_features)
                 vector_fet[0] = len_word
                 vector_fet[1] = num_syl
@@ -199,7 +219,8 @@ class WordClassifier(object):
                 vector_fet[5] = prob
                 vector_fet[6] = prob1
                 vector_fet[7] = prob2
-                vector_fet[8] = classification
+                vector_fet[8] = num_syn
+                vector_fet[9] = classification
 
                 # Store in global matrix
                 matrix[indexRow] = vector_fet
@@ -231,7 +252,7 @@ class WordClassifier(object):
         y_dev = matrix_dev[:, -1] # Assigned class (last column)
 
         # Classification algorithms to test
-        classifiers = [svm.SVC()]
+        classifiers = [SVC(), RandomForestClassifier(), GaussianNB()]
 
         # Compare classifiers
         for item in classifiers:
@@ -260,11 +281,11 @@ class WordClassifier(object):
         X_train = matrix_train[:,0:num_col-1] # Feature array (all columns except last)
         y_train = matrix_train[:, -1] # Assigned class (last column)
         
-        clf = svm.SVC()
+        clf = SVC()
         clf.fit(X_train, y_train)
         joblib.dump(clf, self.CLASSIFIER_OUTPUT)
     
-    def classify(self, word):
+    def classify(self, input):
         
         clf = joblib.load(self.CLASSIFIER_OUTPUT)
-        clf.predict()
+        # TODO: clf.predict() over input, assuming format is that of training set
