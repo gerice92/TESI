@@ -8,7 +8,7 @@ class Article:
 
 
 class Articles_crawler(scrapy.Spider):
-    name = "article_page_crawler"
+    name = "article_crawler"
 
     def __init__(self, *args, **kwargs): 
       super(Articles_crawler, self).__init__(*args, **kwargs) 
