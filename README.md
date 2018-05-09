@@ -14,39 +14,27 @@ This platform is divided into relatively independent modules, which are called i
 
 > Source: classifier/word\_classifier.py
 
-Evaluate and train classifiers for different feature extraction setups, generating a file that can be imported from Python as a ready-to-use classifier. This way, the classifier is trained only once and it can be used from other programs as long as the input conforms to its expectations. This trained complex word classifier will be used in **step 3**.
+Evaluate and train classifiers for different feature extraction setups, generating a file that can be imported from Python as a ready-to-use classifier. This way, the classifier is trained only once and it can be used from other programs as long as the input conforms to its expectations. This trained complex word classifier will be used in **step 2**.
 
 ### Step 1: Crawl web articles
 
 > Source: crawler/
 
-Extract plain text from HTML articles on the web, as well as other elements that help keeping the site's experience (e.g. images, styles). Plain text goes directly to **step 2** to be processed, other elements go to **step 6** as there is no need to transform or process them.
+Extract plain text from HTML articles on the web, as well as other elements that help keeping the site's experience (e.g. images, styles). Plain text (split into sentences) goes directly to **step 2** to be processed, other elements go to **step 4** as there is no need to transform or process them.
 
-### Step 2: Turn plain text into classifier input
-
-> Source: classifier/input\_translator.py
-
-Create input from plain text that satisfies the complex word classifier requirements. Some examples that demonstrate the format expected for the classifier can be found at *classifier/data/wiki\_train\_1.tsv*. This step acts as a translator between **step 1**'s output and **step 3**'s input
-
-### Step 3: Classify words as complex or simple
+### Step 2: Classify words as complex or simple
 
 > Source: classifier/word\_classifier.py
 
-Use the trained complex word classifier to add a class to each sample provided as input. This class can be either *complex* or *simple*.
+Use the trained complex word classifier with a sentence as input and return a list of complex words on the sentence.
 
-### Step 4: Turn classifier output into plain text
-
-> Source: classifier/output\_translator.py
-
-Create plain text from classifier output and prepare a list of complex words that need to be replaced.
-
-### Step 5: Find simple synonyms for complex words
+### Step 3: Find simple synonyms for complex words
 
 > Source: synonyms/synonym\_replace.py
 
-From **step 4's** output (plain text + list of complex words), map each complex word with a simple synonym and then replace each occurrence in the plain text.
+From a sentence, a list of complex words and their respective start and end positions in the sentence, map each complex word with a simple synonym and then replace each occurrence in the sentence.
 
-### Step 6: Generate and open accesible web page
+### Step 4: Generate and open accesible web page
 
 > Source: web/web\_generator.py, web/web\_launcher.py
 
