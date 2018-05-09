@@ -19,7 +19,6 @@ class WordClassifier(object):
     ALGORITHM_SVM = 'svc'
     ALGORITHM_RDM_FST = 'random-forest'
     ALGORITHM_N_B = 'naive-bayes'
-    CLASSIFIER_OUTPUT = 'classifier.pkl'
     
     def __init__(self):
         
@@ -32,6 +31,7 @@ class WordClassifier(object):
         self.wiki_3gram_path = os.path.join(self.package_directory, 'models', 'wiki_3.wngram')
         self.wiki_train_path = os.path.join(self.package_directory, 'data', 'wiki_train_1.tsv')
         self.wiki_eval_path = os.path.join(self.package_directory, 'data', 'wiki_eval_1.tsv')
+        self.classifier_out_path = os.path.join(self.package_directory, 'classifier.pkl')
         
         # Load unigrams
         dic_path = self.wiki_1gram_path
@@ -302,12 +302,12 @@ class WordClassifier(object):
         elif classifier == WordClassifier.ALGORITHM_N_B:
             clf = GaussianNB()
             clf.fit(X_train, y_train)
-            joblib.dump(clf, WordClassifier.CLASSIFIER_OUTPUT)
+            joblib.dump(clf, self.classifier_out_path)
     
     def classify(self, sentence):
         
         # Load classifier object
-        clf = joblib.load(WordClassifier.CLASSIFIER_OUTPUT)
+        clf = joblib.load(self.classifier_out_path)
         
         # Tokenize sentence
         tokens = word_tokenize(sentence)
