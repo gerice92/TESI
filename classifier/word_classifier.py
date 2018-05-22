@@ -15,7 +15,7 @@ import os
 
 class WordClassifier(object):
     
-    NUM_FEATURES = 10
+    NUM_FEATURES = 11
     ALGORITHM_SVM = 'svc'
     ALGORITHM_RDM_FST = 'random-forest'
     ALGORITHM_N_B = 'naive-bayes'
@@ -63,7 +63,7 @@ class WordClassifier(object):
         """Return number of lemmas for a given word
         
         Keyword arguments:
-        word -- the word to calculate the number of synonyms for
+        word -- the word to calculate the number of lemmas for
         """
         
         lemmas = 0
@@ -72,6 +72,20 @@ class WordClassifier(object):
             lemmas += len(synset.lemmas())
                 
         return lemmas
+        
+    def _count_hypernyms(self, word):
+        """Return number of hypernyms for a given word
+        
+        Keyword arguments:
+        word -- the word to calculate the number of hypernyms for
+        """
+        
+        hypernyms = 0
+        
+        for synset in wordnet.synsets(word):
+            hypernyms += len(synset.hypernyms())
+            
+        return hypernyms
 
     def _get_window(self, word, sentence, start):
         """Return words surrounding a given word in a sentence, or -1 if not present
@@ -218,6 +232,7 @@ class WordClassifier(object):
                 prob2 = self._get_probability(trigramR, self.trigrams, self.total_trigrams)
                 
                 num_lem = self._count_lemmas(word) # Word number of lemmas
+                num_hyp = self._count_hypernyms(word) # Word number of hypernyms
 
                 # Prepare feature matrix for current sample
                 vector_fet = np.arange(WordClassifier.NUM_FEATURES)
@@ -230,7 +245,8 @@ class WordClassifier(object):
                 vector_fet[6] = prob1
                 vector_fet[7] = prob2
                 vector_fet[8] = num_lem
-                vector_fet[9] = classification
+                vector_fet[9] = num_hyp
+                vector_fet[10] = classification
 
                 # Store in global matrix
                 matrix[indexRow] = vector_fet
@@ -294,11 +310,11 @@ class WordClassifier(object):
         if classifier == WordClassifier.ALGORITHM_SVM:
             clf = SVC()
             clf.fit(X_train, y_train)
-            joblib.dump(clf, WordClassifier.CLASSIFIER_OUTPUT)
+            joblib.dump(clf, self.classifier_out_path)
         elif classifier == WordClassifier.ALGORITHM_RDM_FST:
             clf = RandomForestClassifier()
             clf.fit(X_train, y_train)
-            joblib.dump(clf, WordClassifier.CLASSIFIER_OUTPUT)
+            joblib.dump(clf, self.classifier_out_path)
         elif classifier == WordClassifier.ALGORITHM_N_B:
             clf = GaussianNB()
             clf.fit(X_train, y_train)
@@ -320,9 +336,14 @@ class WordClassifier(object):
         
         # Remove stop words
         for token in tokens:
-            if token not in stopwords.words('english') and token not in string.punctuation:
+            is_stopword = token in stopwords.words('english')
+            is_punctuation = token in string.punctuation
+            extra_space = 1
+            if not is_stopword and not is_punctuation:
                 token_dic.append((token, pos, pos + len(token)))
-            pos += len(token) + 1
+            if is_punctuation:
+                extra_space = 0
+            pos += len(token) + extra_space
         
         # Prepare feature matrix
         matrix = np.empty(shape = [1, WordClassifier.NUM_FEATURES - 1])

@@ -7,7 +7,7 @@ class SynonymReplace(object):
     def __init__(self):
         return
 
-    def word_swap(phrase,vec):
+    def word_swap(self, phrase, vec):
         """Return the phrase with synonyms instead complex words
         
         Keyword arguments:
@@ -19,21 +19,17 @@ class SynonymReplace(object):
         for vec_word in reversed(vec):
             word = vec_word[0]
             start = vec_word[1]
-            end = vec_word[2]
+            end = vec_word[2] - 1
 
-            i=0
-            for i, ss in enumerate(wn.synsets(word)):
-                synonym = ss.name()
-                print(synonym)
-                if "." in synonym:
-                    synonym = synonym.split(".")[0]
-                #Need to define criteria for synonym selection
-                if i == 2:
-                    break
-
-            if i==0:
-                print('\t'+word + ' is not found in WordNet')
+            synonyms = set()
+            for ss in wn.synsets(word):
+                for lm in ss.lemmas():
+                    synonyms.add(lm.name())
+            if synonyms == {word}:
+                synonym = word
             else:
-                new_phrase = new_phrase[:start] + synonym + new_phrase[end+1:]                
+                synonyms.remove(word.lower())
+                synonym = synonyms.pop()
+            new_phrase = new_phrase[:start] + synonym + new_phrase[end+1:]                
             
         return new_phrase
