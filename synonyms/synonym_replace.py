@@ -25,11 +25,17 @@ class SynonymReplace(object):
             for ss in wn.synsets(word):
                 for lm in ss.lemmas():
                     synonyms.add(lm.name())
-            if synonyms == {word}:
-                synonym = word
-            else:
-                synonyms.remove(word.lower())
-                synonym = synonyms.pop()
-            new_phrase = new_phrase[:start] + synonym + new_phrase[end+1:]                
-            
+            if len(synonyms) > 0:
+                if synonyms == {word}:
+                    synonym = word
+                else:
+                    if word in synonyms:
+                        print("----")
+                        print(len(synonyms))
+                        print(synonyms)
+                        synonyms.remove(word.lower())
+                    print(synonyms)
+                    synonym = synonyms.pop()
+                new_phrase = new_phrase[:start] + synonym + new_phrase[end+1:]                
+
         return new_phrase
