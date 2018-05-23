@@ -14,19 +14,20 @@ def main(start_url):
  
     #Lauch Crawler
     CrawlingProcess = CrawlerProcess({
-        'FEED_URI': 'file:article.json',
+        'FEED_URI': 'file:article1.json',
     })
     try:
-        os.remove('article.json')
+        os.remove('article1.json')
     except OSError:
         pass
     CrawlingProcess.crawl(Article_crawler, start_url = start_url)
     CrawlingProcess.start()
 
     #read json
-    with open('article.json') as f:
+    with open('article.json', encoding='utf-8', newline = "\n") as f:
         data = json.load(f)
-        data_in_lines = data['text'].split(".")
+        data_text = data['text']
+        data_in_lines = data_text.split(".")
     print(data_in_lines)
 
     #Init wordClassifier
@@ -43,8 +44,8 @@ def main(start_url):
     print(new_sentences)
 
     title = data["title"]
-    img = data["img"]
-    text = new_sentences
+    img = data["img_url"]
+    text = " ".join(new_sentences)
     article = [title,img,text]
     
     return article
