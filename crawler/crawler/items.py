@@ -8,7 +8,10 @@
 import scrapy
 
 
-class FinalProjectItem(scrapy.Item):
+class TextItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
+    title = scrapy.Field()
+    img_url = scrapy.Field()
+    text = scrapy.Field()
     pass
