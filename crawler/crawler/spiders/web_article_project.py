@@ -36,7 +36,7 @@ class Article_crawler(scrapy.Spider):
         text = ""
         for p in info:
             line = "".join(p.xpath('.//text()').extract())
-            text += line
+            text += " " + line
         article_item["text"] = text
         yield article_item
          
