@@ -28,7 +28,7 @@ def main(start_url):
     with open('article.json', encoding='utf-8', newline = "\n") as f:
         data = json.load(f)
         data_text = unicodedata.normalize("NFKD", data['text'])
-        data_in_lines = data_text.split(".")
+        data_in_lines = [line.replace('.', '') for line in data_text.split(". ")]
     print(data_in_lines)
 
     #Init wordClassifier
