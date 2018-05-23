@@ -7,7 +7,6 @@ from sklearn.metrics import precision_recall_fscore_support
 from sklearn.externals import joblib
 from nltk.corpus import wordnet
 from nltk.corpus import stopwords
-from nltk import word_tokenize
 import csv
 import string
 import numpy as np
@@ -324,10 +323,7 @@ class WordClassifier(object):
         clf = joblib.load(self.classifier_out_path)
         
         # Tokenize sentence
-        tokens = word_tokenize(sentence)
-        
-        # Recreate sentence from tokenization
-        sentence = ' '.join(tokens)
+        tokens = sentence.split(' ')
         
         pos = 0
         token_dic = list()

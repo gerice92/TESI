@@ -6,6 +6,7 @@ from website.web_generator import WebGenerator
 from website.web_launcher import WebLauncher
 from crawler.crawler.spiders.web_article_project import Article_crawler
 from scrapy.crawler import CrawlerProcess
+from nltk import sent_tokenize
 import webbrowser
 import unicodedata
 import json
@@ -28,7 +29,7 @@ def main(start_url):
     with open('article.json', encoding='utf-8', newline = "\n") as f:
         data = json.load(f)
         data_text = unicodedata.normalize("NFKD", data['text'])
-        data_in_lines = [line.replace('.', '') for line in data_text.split(". ")]
+        data_in_lines = [sent.strip() for sent in sent_tokenize(data_text)]
     print(data_in_lines)
 
     #Init wordClassifier
