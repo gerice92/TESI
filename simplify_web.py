@@ -15,17 +15,17 @@ def main(start_url):
  
     #Lauch Crawler
     CrawlingProcess = CrawlerProcess({
-        'FEED_URI': 'file:article1.json',
+        'FEED_URI': 'file:article.json',
     })
     try:
-        os.remove('article1.json')
+        os.remove('article.json')
     except OSError:
         pass
     CrawlingProcess.crawl(Article_crawler, start_url = start_url)
     CrawlingProcess.start()
 
     #read json
-    with open('article1.json', encoding='utf-8', newline = "\n") as f:
+    with open('article.json', encoding='utf-8', newline = "\n") as f:
         data = json.load(f)
         data_text = unicodedata.normalize("NFKD", data['text'])
         data_in_lines = data_text.split(".")
@@ -47,6 +47,7 @@ def main(start_url):
     title = data["title"]
     img = data["img_url"]
     text = " ".join(new_sentences)
+    text = text.replace("\t"," ")
     article = [title,img,text]
     
     return article
