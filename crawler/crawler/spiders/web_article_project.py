@@ -28,14 +28,14 @@ class Article_crawler(scrapy.Spider):
         bunch_articles = []
         title = response.xpath('//div[@id="main"]//header[@class="article-header"]//h1[@class="title"]/text()').extract_first()
         img = response.xpath('//div[@id="main"]//header[@class="article-header"]//figure[@class="article-image"]//img[@class="microcontent"]/@src').extract_first()
-        info  = response.xpath('//div[@id="main"]//section[@class="article-content blueprint"]//p[not((parent::blockquote) or @class="see-also-link")]')
+        info  = response.xpath('//div[@id="main"]//section[@class="article-content blueprint"]//p[not((parent::blockquote) or @class="see-also-link") and not(parent::div[@class="image-credit"])]')
  
         article_item['title'] = title
         article_item['img_url'] = img
 
         text = ""
         for p in info:
-            line = "".join(p.xpath('./text()').extract())
+            line = "".join(p.xpath('.//text()').extract())
             text += line
         article_item["text"] = text
         yield article_item
