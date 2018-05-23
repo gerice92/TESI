@@ -36,17 +36,17 @@ class WordClassifier(object):
         # Load unigrams
         dic_path = self.wiki_1gram_path
         self.unigrams = self._load_dic(dic_path)
-        self.total_unigrams = sum(iter(self.unigrams.values()))
+        self.total_unigrams = sum(self.unigrams.values())
 
         # Loag bigrams
         dic_path = self.wiki_2gram_path
         self.bigrams = self._load_dic(dic_path)
-        self.total_bigrams = sum(iter(self.bigrams.values()))
+        self.total_bigrams = sum(self.bigrams.values())
 
         # Load trigrams
         dic_path = self.wiki_3gram_path
         self.trigrams = self._load_dic(dic_path)
-        self.total_trigrams = sum(iter(self.trigrams.values()))
+        self.total_trigrams = sum(self.trigrams.values())
 
     def _count_syll(self, word):
         """Return number of syllables for a given word
@@ -201,10 +201,11 @@ class WordClassifier(object):
                 end = int(row[3]) # Ending character index of word in sentence
                 word = row[4] # Word to classify
                 classification = int(row[9]) # Clasification: 0 means simple, 1 means complex
-                probability = int(float(row[10]) * 100) # Word probability
             
                 len_word = end - start # Word length
                 num_syl = self._count_syll(word) # Word number of syllables
+                num_lem = self._count_lemmas(word) # Word number of lemmas
+                num_hyp = self._count_hypernyms(word) # Word number of hypernyms
                 len_sen = len(sentence) # Sentence length
                 w_2,w_1,w1,w2 = self._get_window(word, sentence, start) # Window
 
@@ -230,9 +231,6 @@ class WordClassifier(object):
                 prob2 = 0
                 trigramR = word + ' ' + w1 + ' ' + w2
                 prob2 = self._get_probability(trigramR, self.trigrams, self.total_trigrams)
-                
-                num_lem = self._count_lemmas(word) # Word number of lemmas
-                num_hyp = self._count_hypernyms(word) # Word number of hypernyms
 
                 # Prepare feature matrix for current sample
                 vector_fet = np.arange(WordClassifier.NUM_FEATURES)
@@ -357,7 +355,8 @@ class WordClassifier(object):
             
             len_word = end - start
             num_syl = self._count_syll(word)
-            num_lem = self._count_lemmas(word)
+            num_lem = self._count_lemmas(word) # Word number of lemmas
+            num_hyp = self._count_hypernyms(word) # Word number of hypernyms
             w_2,w_1,w1,w2 = self._get_window(word, sentence, start) # Window
 
             # Left trigram probability
@@ -394,6 +393,7 @@ class WordClassifier(object):
             vector_fet[6] = prob1
             vector_fet[7] = prob2
             vector_fet[8] = num_lem
+            vector_fet[9] = num_hyp
             
             matrix[0] = vector_fet
             
