@@ -7,6 +7,7 @@ from website.web_launcher import WebLauncher
 from crawler.crawler.spiders.web_article_project import Article_crawler
 from scrapy.crawler import CrawlerProcess
 import webbrowser
+import unicodedata
 import json
 import os
 
@@ -24,9 +25,9 @@ def main(start_url):
     CrawlingProcess.start()
 
     #read json
-    with open('article.json', encoding='utf-8', newline = "\n") as f:
+    with open('article1.json', encoding='utf-8', newline = "\n") as f:
         data = json.load(f)
-        data_text = data['text']
+        data_text = unicodedata.normalize("NFKD", data['text'])
         data_in_lines = data_text.split(".")
     print(data_in_lines)
 
