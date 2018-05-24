@@ -25,13 +25,10 @@ class SynonymReplace(object):
             for ss in wn.synsets(word):
                 for lm in ss.lemmas():
                     synonyms.add(lm.name())
-            if len(synonyms) > 0:
-                if synonyms == {word}:
-                    synonym = word
-                else:
-                    if word in synonyms:
-                        synonyms.remove(word.lower())
-                    synonym = synonyms.pop()
+            if len(synonyms) > 0 and synonyms != {word}:
+                if word in synonyms:
+                    synonyms.remove(word.lower())
+                synonym = min(synonyms, key=len)
                 new_phrase = new_phrase[:start] + synonym + new_phrase[end+1:]                
 
         return new_phrase
