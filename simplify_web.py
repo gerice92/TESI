@@ -16,8 +16,8 @@ def main(start_url):
     
     # Train/Test classifiers (Optional step)
     wc = WordClassifier()
-    #wc.train_classifier('naive-bayes')
-    #wc.test_classifiers()
+    wc.train_classifier('naive-bayes')
+    wc.test_classifiers()
  
     # Run crawling process
     CrawlingProcess = CrawlerProcess({'FEED_URI': 'file:article.json',})
@@ -50,7 +50,7 @@ def main(start_url):
     return article
 
 if __name__ == "__main__":
-   article = main("https://mashable.com/2018/04/28/facebook-fake-news-smaller-feed/#JMBs_1D1Paqs")
+   article = main("https://mashable.com/2018/04/13/mark-zuckerberg-scottish-accent/#8UULG0J0Viqb")
    print(article[0])
    print(article[1])
    print(article[2])

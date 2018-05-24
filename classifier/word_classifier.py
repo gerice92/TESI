@@ -261,10 +261,10 @@ class WordClassifier(object):
         """Print statistics for multiple classifiers"""
 
         # Training set from Wikipedia.org samples
-        matrix_train = self._get_matrix(self.wiki_train_path).astype(int)
+        matrix_train = self._get_matrix(self.wiki_train_path)
 
         # Evaluation set from Wikipedia.org samples
-        matrix_dev = self._get_matrix(self.wiki_eval_path).astype(int)
+        matrix_dev = self._get_matrix(self.wiki_eval_path)
 
         # Feature matrix for training set
         num_col = matrix_train.shape[1]
@@ -299,7 +299,7 @@ class WordClassifier(object):
     def train_classifier(self, classifier):
         
         # Training set from Wikipedia.org samples
-        matrix_train = self._get_matrix(self.wiki_train_path).astype(int)
+        matrix_train = self._get_matrix(self.wiki_train_path)
         
         # Training set
         num_col = matrix_train.shape[1]

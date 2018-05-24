@@ -17,7 +17,7 @@ class SynonymReplace(object):
         new_phrase = phrase
 
         for vec_word in reversed(vec):
-            word = vec_word[0]
+            word = vec_word[0].lower()
             start = vec_word[1]
             end = vec_word[2] - 1
 
@@ -27,7 +27,7 @@ class SynonymReplace(object):
                     synonyms.add(lm.name())
             if len(synonyms) > 0 and synonyms != {word}:
                 if word in synonyms:
-                    synonyms.remove(word.lower())
+                    synonyms.remove(word)
                 synonym = min(synonyms, key=len)
                 new_phrase = new_phrase[:start] + synonym + new_phrase[end+1:]                
 
