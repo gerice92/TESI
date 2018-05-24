@@ -15,7 +15,8 @@ class WebGenerator(object):
         page = f.read()
         page_original = page
 
-        page = page.replace('article_img',img)
+        page = page.replace('article_img', img)
+        page = page.replace('<title></title>', '<title>' + title + '</title>')
         page = page.replace("<h1 class='title'></h1>","<h1 class='title'>" + title + "</h1>")
         page = page.replace('<p class="main_article"></p>','<p class="main_article">' + text + '<p>')
 

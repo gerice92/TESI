@@ -16,8 +16,8 @@ def main(start_url):
     
     # Train/Test classifiers (Optional step)
     wc = WordClassifier()
-    wc.train_classifier('naive-bayes')
-    wc.test_classifiers()
+    #wc.train_classifier('naive-bayes')
+    #wc.test_classifiers()
  
     # Run crawling process
     CrawlingProcess = CrawlerProcess({'FEED_URI': 'file:article.json',})
