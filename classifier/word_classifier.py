@@ -7,6 +7,8 @@ from sklearn.metrics import precision_recall_fscore_support
 from sklearn.externals import joblib
 from nltk.corpus import wordnet
 from nltk.corpus import stopwords
+from nltk.tokenize import TreebankWordTokenizer
+from nltk import word_tokenize
 import csv
 import string
 import numpy as np
@@ -95,7 +97,7 @@ class WordClassifier(object):
         start -- the character index for the word in the sentence
         """
 
-        # Split sentence by whitespaces to get all tokens
+        # Split sentence to get all tokens
         tokens = sentence.split()
         
         # Count tokens
@@ -323,21 +325,17 @@ class WordClassifier(object):
         clf = joblib.load(self.classifier_out_path)
         
         # Tokenize sentence
-        tokens = sentence.split(' ')
+        tokens = word_tokenize(sentence)
         
-        pos = 0
-        token_dic = list()
+        spans = [span for span in TreebankWordTokenizer().span_tokenize(sentence)]
+        token_pos = list()
         
         # Remove stop words
-        for token in tokens:
+        for index, token in enumerate(tokens):
             is_stopword = token in stopwords.words('english')
             is_punctuation = token in string.punctuation
-            extra_space = 1
             if not is_stopword and not is_punctuation:
-                token_dic.append((token, pos, pos + len(token)))
-            if is_punctuation:
-                extra_space = 0
-            pos += len(token) + extra_space
+                token_pos.append((token, spans[index][0], spans[index][1]))
         
         # Prepare feature matrix
         matrix = np.empty(shape = [1, WordClassifier.NUM_FEATURES - 1])
@@ -347,13 +345,25 @@ class WordClassifier(object):
         
         res = list()
         
-        for word, start, end in token_dic:
+        for index, (word, start, end) in enumerate(token_pos):
             
             len_word = end - start
+            len_dic = len(token_pos)
             num_syl = self._count_syll(word)
             num_lem = self._count_lemmas(word) # Word number of lemmas
             num_hyp = self._count_hypernyms(word) # Word number of hypernyms
-            w_2,w_1,w1,w2 = self._get_window(word, sentence, start) # Window
+            w_2 = str()
+            w_1 = str()
+            w1 = str()
+            w2 = str()
+            if index - 2 >= 0:
+                w_2 = token_pos[index - 2][0]
+            if index - 1 >= 0:
+                w_1 = token_pos[index - 1][0]
+            if index + 1 < len_dic:
+                w1 = token_pos[index + 1][0]
+            if index + 2 < len_dic:
+                w2 = token_pos[index + 2][0]
 
             # Left trigram probability
             prob_2 = 0

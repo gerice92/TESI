@@ -13,11 +13,14 @@ import json
 import os
 
 def main(start_url):
+    
+    # Train/Test classifiers (Optional step)
+    wc = WordClassifier()
+    wc.train_classifier('naive-bayes')
+    wc.test_classifiers()
  
-    #Lauch Crawler
-    CrawlingProcess = CrawlerProcess({
-        'FEED_URI': 'file:article.json',
-    })
+    # Run crawling process
+    CrawlingProcess = CrawlerProcess({'FEED_URI': 'file:article.json',})
     try:
         os.remove('article.json')
     except OSError:
@@ -25,30 +28,23 @@ def main(start_url):
     CrawlingProcess.crawl(Article_crawler, start_url = start_url)
     CrawlingProcess.start()
 
-    #read json
+    # Read crawler output
     with open('article.json', encoding='utf-8', newline = "\n") as f:
         data = json.load(f)
         data_text = unicodedata.normalize("NFKD", data['text'])
-        data_in_lines = [sent.strip() for sent in sent_tokenize(data_text)]
-    print(data_in_lines)
+        data_in_lines = [sent.strip().replace("\"", "\'") for sent in sent_tokenize(data_text)]
 
-    #Init wordClassifier
-    wc = WordClassifier()
-    wc.train_classifier('naive-bayes')
-    #wc.test_classifiers()
+    # Operate over text sentences
     new_sentences = list()
-    #for line in ["this is a test of the complex word classifier, does it work strange thing huh?", "Evergreen trees are a symbol of fertility because they do not die in the winter"]:
     for line in data_in_lines:
-        wc_result = wc.classify(line)
+        wc_result = wc.classify(line) # Classify words in line
         sr = SynonymReplace()
-        sr_result = sr.word_swap(line, wc_result)
+        sr_result = sr.word_swap(line, wc_result) # Replace complex with simple
         new_sentences.append(sr_result)
-    print(new_sentences)
 
     title = data["title"]
     img = data["img_url"]
     text = " ".join(new_sentences)
-    text = text.replace("\t"," ")
     article = [title,img,text]
     
     return article

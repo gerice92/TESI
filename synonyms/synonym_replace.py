@@ -30,11 +30,7 @@ class SynonymReplace(object):
                     synonym = word
                 else:
                     if word in synonyms:
-                        print("----")
-                        print(len(synonyms))
-                        print(synonyms)
                         synonyms.remove(word.lower())
-                    print(synonyms)
                     synonym = synonyms.pop()
                 new_phrase = new_phrase[:start] + synonym + new_phrase[end+1:]                
 
