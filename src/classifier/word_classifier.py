@@ -60,33 +60,28 @@ class WordClassifier(object):
         num_syl = syll(word)
         return num_syl
         
-    def _count_lemmas(self, word):
-        """Return number of lemmas for a given word
+    def _count_synsets(self, word):
+        """Return number of synsets for a given word
         
         Keyword arguments:
-        word -- the word to calculate the number of lemmas for
+        word -- the word to calculate the number of synsets for
         """
         
-        lemmas = 0
-        
-        for synset in wordnet.synsets(word):
-            lemmas += len(synset.lemmas())
-                
-        return lemmas
+        return len(wordnet.synsets(word))
         
     def _count_hypernyms(self, word):
-        """Return number of hypernyms for a given word
+        """Return longest hypernym length to the root for a given word
         
         Keyword arguments:
         word -- the word to calculate the number of hypernyms for
         """
         
-        hypernyms = 0
+        max_hypernyms = 0
         
         for synset in wordnet.synsets(word):
-            hypernyms += len(synset.hypernyms())
+            max_hypernyms = max(max_hypernyms, synset.max_depth())
             
-        return hypernyms
+        return max_hypernyms
 
     def _get_window(self, word, sentence, start):
         """Return words surrounding a given word in a sentence, or -1 if not present
@@ -205,7 +200,7 @@ class WordClassifier(object):
             
                 len_word = end - start # Word length
                 num_syl = self._count_syll(word) # Word number of syllables
-                num_lem = self._count_lemmas(word) # Word number of lemmas
+                num_lem = self._count_synsets(word) # Word number of lemmas
                 num_hyp = self._count_hypernyms(word) # Word number of hypernyms
                 len_sen = len(sentence) # Sentence length
                 w_2,w_1,w1,w2 = self._get_window(word, sentence, start) # Window
@@ -350,7 +345,7 @@ class WordClassifier(object):
             len_word = end - start
             len_dic = len(token_pos)
             num_syl = self._count_syll(word)
-            num_lem = self._count_lemmas(word) # Word number of lemmas
+            num_lem = self._count_synsets(word) # Word number of lemmas
             num_hyp = self._count_hypernyms(word) # Word number of hypernyms
             w_2 = str()
             w_1 = str()
