@@ -1,0 +1,95 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[hyperref]{naaclhlt2018}
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage{url}
+
+\aclfinalcopy % Print article as final version
+\setlength\titlebox{10cm} % Create vertical space for the authors
+\newcommand\BibTeX{B{\sc ib}\TeX}
+
+\title{Complex word identification and replacement for a more accessible web experience in Mashable.com}
+
+\author{Gerardo Quiros Sandoval \\
+  Universidad Carlos III de Madrid \\
+  Avda. Universidad, 30 \\
+  28911 Leganés, Madrid \\
+  España (Spain) \\
+  {\tt 100355573@alumnos.uc3m.es} \\\And
+  Roxana Rodríguez Goncalves \\
+  Universidad Carlos III de Madrid \\
+  Avda. Universidad, 30 \\
+  28911 Leganés, Madrid \\
+  España (Spain) \\
+  {\tt 100378389@alumnos.uc3m.es} \\\AND
+  Adrián Ruiz Arroyo \\
+  Universidad Carlos III de Madrid \\
+  Avda. Universidad, 30 \\
+  28911 Leganés, Madrid \\
+  España (Spain) \\
+  {\tt 100303525@alumnos.uc3m.es} \\}
+
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+In this paper, we explain and discuss an architecture for word simplification based on the Mashable.com news site. This process includes content retrieval, complex word classification using machine learning, substitution with a simple counterpart and site remodeling following WCAG 2.0 guidelines. Different approaches for the complex word classifier are explored, as it is the core module for this architecture.
+\end{abstract}
+
+\section{Credits}
+
+This document serves as a report for our final assignment at \emph{Tecnologías Emergentes en la Sociedad de la Información}, as part of the \emph{Ciencia y Tecnología Informática} master’s degree at \emph{Universidad Carlos III de Madrid}.
+
+We would like to thank this institution and their members for their involvement in increasing knowledge and innovation.
+
+\section{Introduction}
+
+Cognitive impairment, aphasia and an increasing variety of diseases affect the way people reach meaning through content and can prohibit their access to mass media if obscure vocabulary or extended blocks of text are used throughout articles~\cite{feng2008text}.
+
+In Europe, and many other developed regions, where elderly population is increasing whereas natality is decreasing~\cite{hoff2011population}, cognitive impairment will soon become a major problem, as it can also arise –normally at a milder degree– as a symptom of age~\cite{butler2004maintaining}.
+
+There are many other groups that are also affected by complex text: second language learners and illiterates~\cite{petersen2007text}, people suffering dyslexia~\cite{rello2013simplify} and children~\cite{de2010text}, among others. In general, they need simple and common words to be able to fully understand text. Even if they could understand some complex words, the reading process would be tougher and that could discourage them from further reading~\cite{ediger2002reading}.
+
+Barriers related to complex text can be bypassed by stablishing a series of guidelines for writers, who must adapt a simple language and thorough criteria for grammar usage~\cite{freyhoff1998make}. One of the main problems with this solution is that not every news media is willing to invest resources in accessibility. Old articles and feeds are also not affected by this solution: they will either remain as they were, or they must be rewritten to increase their accessibility.
+
+To avoid these problems, tools for language simplification can be used. These tools work for old and new articles, and they don’t rely on news media’ approaches on accessibility or their economic resources.
+
+For this task, one of the main objectives is improving natural language processing techniques. This article focuses on one of its topics: \textbf{complex word identification (CWI)}.
+
+The task of complex word identification (CWI) has seen great improvement over the last few years, as machine learning capabilities and big data approaches are expanding and becoming commonplace~\cite{lohr2012age}, in contrast with the restricting requirements and economical backing they demanded in their inception~\cite{cox1997managing}.
+
+One of the main annual events that cover this topic is the \textbf{Conference of the North American Chapter of the Association for Computacional Linguistics: Human Language Technologies (NAACL HLT)}, and their long paper submission count and acceptance rate is increasing overtime~\cite{naaclacc}.
+
+It is then worthwhile to review literature in search for good features that can help identifying complex words, as there should be plenty of investigation already done in the area.
+
+To that extend, the aim of this article is to \textbf{present an architecture that support the task of complex word simplification for a popular news website}. We chose Mashable.com for its entertainment and technology covering, topics that should mix both simple and complex vocabulary. After identification of complex words, we replace them with a simple alternative, so that the meaning prevails through the content. As the original site might contain elements that aren't accesible, we end the process by generating a web page derived from the original that keeps content but conforms to a well-known compendium of accessibility guidelines: \textbf{WCAG 2.0}~\cite{caldwell2008web}.
+
+The evaluation of this architecture is centered on the classification algorithm chosen for the identification task. As of the WCAG conformance, it is checked through a validation tool. We will discuss these issues on the \textbf{Results and Conclusion} sections of this paper.
+
+\section{Previous Work on CWI}
+
+Some of the most recent papers that apply modern classification techniques to the CWI problem rely on a diverse array of features and the SVM algorithm. \textbf{The usage of machine learning schemes is not common in older works but has proven to offer better results than previous approaches}.
+
+The problem with this method is that its efficacy greatly depends on the availability of a diverse and correctly classified dataset, either for training or evaluation. As each language has its own properties and peculiarities, the features that explain complex words in a classifier may only work for a single language. For common languages, like English, this is not a problem, as there are some settled datasets and dictionaries that work well for CWI. For other languages, where finding a dataset might be trickier, this is a huge problem, as \textbf{there might be no option for machine learning to be applied until a good dataset is available}.
+
+Moreover, the classification of complex words is a consensual matter, which means there is no absolute law that distinguishes complex words from simple ones. This means there is a necessity for a significant number of human annotators –commonly, experts in linguistics– that manually classify each word of the dataset. \textbf{Arranging this board of experts requires resources, and it is a necessity if there are no available datasets or if the available datasets are not good enough}.
+
+We chose a machine learning approach over a classical approach because we are classifying English words and there are well known datasets for this language.
+
+In our search for relevant word features that might explain word complexity for the English language, we carried out a literature review. We explored conferences starting from year 2000 and that included a CWI section.
+
+One of the most successful approaches, presented at SemEval 2016, is extensively explained in two articles~\cite{paetzold2016semeval} and~\cite{paetzold2016sv000gg}.
+
+\bibliography{tesi_articulo}
+\bibliographystyle{acl_natbib}
+
+\appendix
+
+\section{Source Code}
+
+\section{Firefox Addon}
+
+\end{document}
