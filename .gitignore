@@ -1,4 +1,11 @@
 #
+# PROJECT SPECIFIC
+#
+
+src/accesible_web.html
+src/article.json
+
+#
 # PYTHON
 #
 
