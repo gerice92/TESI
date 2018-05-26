@@ -127,7 +127,58 @@ In fact, these features are pretty similar to the ones used in~\cite{paetzold201
 
 \section{Proposed Architecture}
 
+For text simplification of a news website, we propose a modular architecture where each module solves an individual problem. The association between each module an the problem it is designed to solve is:
 
+\begin{itemize}
+	\item{\textbf{Web Article Crawling}: For a news media web site (e.g. Mashable.com), receive the URL of one of its articles (assuming they all share a similar structure) and retrieve its title, the URL of its front picture and its main content.}
+	\item{\textbf{Complex Word Identification}: For each word contained in every sentence of the news body, obtain a list of complex words and the relative position in its sentence.}
+	\item{\textbf{Complex Word Replacement}: For each complex word in a sentence, obtain a suitable simple alternative and then prepare a new sentence with every complex word replaced by its alternative.}
+	\item{\textbf{Accessible Web Page Generation}: For each replacement sentence, and given the title and front picture of an article, generate a web page that keeps the look-and-feel of the original web page and conforms to the WCAG 2.0~\cite{caldwell2008web} guidelines.}
+\end{itemize}
+
+To reach every possible audience and to guarantee the extensibility of the architecture, we propose two user interfaces:
+
+\begin{itemize}
+	\item{\textbf{Command Line Interface (CLI)}: This interface is operated through a terminal window in a graphical user interface, receives the URL of the article to simplify and opens a web browser window with the simplified version of the web page. We provide a reference implementation which requires a Python 3 interpreter to be installed, along with some dependencies that are listed in appendix~\ref{sec:src}}.
+	\item{\textbf{Mozilla Firefox Extension}: This interface consists of a button embedded in the Mozilla Firefox web browser that, once clicked in the desired news page, loads a simplified version of the page highlighting the words that have been replaced. We provide a reference implementation of this Firefox Extension which requires some additional setup. In appendix~\ref{sec:mfx}, we provide further instruction.}
+\end{itemize}
+
+In the following subsections, we provide more insight into the \emph{complex word identification algorithm} and the \emph{complex word replacement algorithm} that we have implemented.
+
+\subsection{Complex Word Classification Algorithm}
+
+For word classification, a machine learning approach was chosen. Thus, we defined \textbf{10 features} based on our literature review. This features are:
+
+\begin{itemize}
+	\item{\textbf{Word length}: Complex words might be longer than simple words.}
+	\item{\textbf{Number of syllables}: Complex words might feature a higher number of syllables than simple words.}
+	\item{\textbf{Sentence length}: Longer sentences may have impact on the perceived complexity of the words it contains.}
+	\item{\textbf{n-gram probability}: For a window of 3 elements, probability of each combination of previous and subsequent words to appear in a dataset. Unfolding this setting, a total of five features arise.}
+	\item{\textbf{Number of synsets}: Complex words might have a smaller set of meanings than a simple word, as its use could be less frequent.}
+	\item{\textbf{Number of hypernyms}: A complex word might be so specific that its hypernym tree is huge, while a simple word tends to stay near the top of the tree.}
+\end{itemize}
+
+The election of a well-suited machine learning algorithm is one of the most critical decisions for the classifier. For this reason, we tested \textbf{three different algorithms} for evaluation:
+
+\begin{itemize}
+	\item{\textbf{SVC}: C-Support Vector Classification~\cite{chang2011libsvm}.}
+	\item{\textbf{RandomForest}: Random Forest Classification.~\cite{ho1998random}.}
+	\item{\textbf{GaussianNB}: Gaussian Naive Bayes Classification.~\cite{hand2001idiot}.}
+\end{itemize}
+
+Moving on to the data samples, we used a single dataset, from which we build \textbf{two different and statically-partitioned subsets}, one for \emph{training} and one for \emph{evaluation}. The only source for the data is Wikipedia, as it combines both simple and complex words. We make the dataset available to the public as well as the rest of the source code for the reference implementations (for further instructions, refer to appendix~\ref{sec:src}).
+
+In the reference implementations, we also used the \textbf{WordNet lexical database for English}~\cite{miller1995wordnet} to obtain the synsets and hypernyms for a word.
+
+\subsection{Complex Word Replacement Algorithm}
+
+We took a simple approach for the task of complex word replacement. This is the main weakness in the reference implementations and we expect future works to improve this situation.
+
+Without any evaluation of the part-of-speech (POS) –this means contextual information is ignored–, the \textbf{shortest synonym available} through WordNet is chosen.
+
+\section{Evaluation}
+
+\section{Conclusions}
 
 \bibliography{tesi_articulo}
 \bibliographystyle{acl_natbib}
@@ -135,7 +186,9 @@ In fact, these features are pretty similar to the ones used in~\cite{paetzold201
 \appendix
 
 \section{Source Code}
+\label{sec:src}
 
 \section{Firefox Addon}
+\label{sec:mfx}
 
 \end{document}
