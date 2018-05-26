@@ -69,7 +69,11 @@ To that extend, the aim of this article is to \textbf{present an architecture th
 
 The evaluation of this architecture is centered on the classification algorithm chosen for the identification task. As of the WCAG conformance, it is checked through a validation tool. We will discuss these issues on the \textbf{Results and Conclusion} sections of this paper.
 
-\section{Previous Work on CWI}
+\section{Previous Work}
+
+The two critical parts of text simplification are the \textbf{identification of complex words} and the \textbf{election of a simple alternative}. These are the main topics in need of a literature review, as current solutions are still not very polished.
+
+\subsection{Complex Word Identification (CWI)}
 
 Some of the most recent papers that apply modern classification techniques to the CWI problem rely on a diverse array of features and the SVM algorithm. \textbf{The usage of machine learning schemes is not common in older works but has proven to offer better results than previous approaches}.
 
@@ -81,7 +85,49 @@ We chose a machine learning approach over a classical approach because we are cl
 
 In our search for relevant word features that might explain word complexity for the English language, we carried out a literature review. We explored conferences starting from year 2000 and that included a CWI section.
 
-One of the most successful approaches, presented at SemEval 2016, is extensively explained in two articles~\cite{paetzold2016semeval} and~\cite{paetzold2016sv000gg}.
+One of the most successful approaches, known as \textbf{SV000gg} and presented at \textbf{SemEval 2016}, is extensively explained in two articles~\cite{paetzold2016semeval} and~\cite{paetzold2016sv000gg}. We believe this is one of the most complete works available, as it relies on multiple classifiers and features to make a decision. Some of them are the usual suspects; that is, well-known algorithms that have been exhaustively tested over the years by previous authors.
+
+The system described by the authors implements a \emph{hard voting} algorithm and a \emph{soft voting} algorithm. These algorithms decide whether a word is simple or complex by examining the output of multiple classifiers for the word and its context. The input for the classifiers contains \textbf{69 features}, which the authors categorize as:
+
+\begin{itemize}
+	\item{\textbf{Binary}: Features based on the word being part of a simple vocabulary.}
+	\item{\textbf{Lexical}: Features based on the number of syllables, senses, hypernyms, word length, \dots etc.}
+	\item{\textbf{Collocational}: Features related to the properties of the word's surroundings (window or n-gram).}
+	\item{\textbf{Nominal}: Features related to the word's function in its context (part-of-speech or \emph{POS}).}
+\end{itemize}
+
+Moreover, the voting system applies to \textbf{21 classifiers}, that are also categorized:
+
+\begin{itemize}
+	\item{\textbf{Lexicon-based}: Algorithms that classify the word as simple or complex by consulting vocabularies.}
+	\item{\textbf{Threshold-based}: Algorithms that receive features for training and define a threshold of their values to decide if future words are simple or complex.}
+	\item{\textbf{Machine Learning-assisted}: Algorithms based on machine learning techniques to train a classifier. E.g.: SVM, Decision Trees, Random Forests, Stochastic Gradient Descent or Gradient Boosting and Multi-Layer Perceptrons.}
+\end{itemize}
+
+This information proved very valuable, as \emph{the hard-voting and soft-voting algorithms achived the two greatest scores in SemEval 2016}. Our approach is far less complex: \textbf{if we had implemented a system as sophisticated as SV000gg, it would have required an entire essay itself}.
+
+Instead, we focused on the architectural aspect of web simplification. If every module is correctly defined and isolated, then the classifier can be easily improved in the future.
+
+\subsection{Complex Word Replacement}
+
+The task of complex word replacement is hard due to the need to \emph{keep the same meaning the complex word had in its context} and the requirement that the alternative word \emph{has to diminish the complexity of the original word}.
+
+Complex word replacement is stil predominantly done by using sets of rules~\cite{glavavs2015simplifying}. With this rules, long and complex words are substituted by a short and simple alternative. As with complex word classification, the process of manually compiling this set of rules requires resources and can't be easily extended to different languages.
+
+Also in~\cite{glavavs2015simplifying}, the authors describe a classifier that can report the \textbf{10 best candidates to replace a word}. The features it uses are:
+
+\begin{itemize}
+	\item{\textbf{Semantic Similarity}: Meaning comparison between one word and the other.}
+	\item{\textbf{Context Similarity}: Since the meaning of a word can depend of its context, similarity between the context of one word and the usual contexts of the other.}
+	\item{\textbf{Difference of Information Contents}: Meaning complexity of one word compared to the other.}
+	\item{\textbf{Language Model Features}: Probability of the replacement word to appear in the context of the original word.}
+\end{itemize}
+
+In fact, these features are pretty similar to the ones used in~\cite{paetzold2016sv000gg}. The results reported by the authors, that ran the algorithm over the \textbf{SemEval 2012} dataset, seems promising. The only drawback is it only works with single words. This is not a problem however, as CWI classifiers only work with single words too.
+
+\section{Proposed Architecture}
+
+
 
 \bibliography{tesi_articulo}
 \bibliographystyle{acl_natbib}
