@@ -2,8 +2,8 @@
 # PROJECT SPECIFIC
 #
 
-src/accesible_web.html
-src/article.json
+src/website/accesible_web.html
+src/crawler/article.json
 
 #
 # PYTHON

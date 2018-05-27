@@ -1,43 +1,31 @@
 #!/usr/bin/env python3
 
-from classifier.word_classifier import WordClassifier
-from synonyms.synonym_replace import SynonymReplace
-from website.web_generator import WebGenerator
-from website.web_launcher import WebLauncher
-from crawler.crawler.spiders.web_article_project import Article_crawler
-from scrapy.crawler import CrawlerProcess
-from nltk import sent_tokenize
+import argparse
 import webbrowser
 import unicodedata
 import json
-import os
-import sys
 
-from multiprocessing import Process, Queue
-from twisted.internet import reactor
-from scrapy.crawler import CrawlerRunner
+from nltk import sent_tokenize
 
-def main(start_url):
-    global runner
+from crawler.mashable_crawler import MashableCrawler
+from classifier.word_classifier import WordClassifier
+from synonyms.synonym_replace import SynonymReplace
+from website.web_generator import WebGenerator
+
+def simplify(url):
+    """Return article segments from URL"""
 
     # Train/Test classifiers (Optional step)
     wc = WordClassifier()
-    wc.train_classifier('naive-bayes')
     wc.test_classifiers()
- 
-    # Run crawling process
-    CrawlingProcess = CrawlerProcess({'FEED_URI': 'file:article.json',})
-    try:
-        os.remove('article.json')
-    except OSError:
-        pass
-    #CrawlingProcess.crawl(Article_crawler, start_url = start_url)
-    #CrawlingProcess.start()
+    wc.train_classifier('naive-bayes')
     
-    run_spider(start_url)
+    # Start crawling process
+    cr = MashableCrawler()
+    cr.retrieve(url)
 
     # Read crawler output
-    with open('article.json', encoding='utf-8', newline = "\n") as f:
+    with open(cr.article_path, encoding='utf-8', newline = "\n") as f:
         data = json.load(f)
         data_text = unicodedata.normalize("NFKD", data['text'])
         data_in_lines = [sent.strip().replace("\"", "\'") for sent in sent_tokenize(data_text)]
@@ -53,46 +41,22 @@ def main(start_url):
     title = data["title"]
     img = data["img_url"]
     text = " ".join(new_sentences)
-    article = [title,img,text]
     
+    # Start accesible web generation process
+    wg = WebGenerator()
+    article = wg.generate(title, img, text)
     return article
-
-def get_html_article(start_url):
-    article = main(start_url)
-    html_article = WebGenerator.webGenerator(article[0],article[1],article[2])
-    return html_article
-
-def run_spider(start_url):
-    def f(q):
-        try:
-            runner = CrawlerRunner({'FEED_URI': 'file:article.json',})
-            deferred = runner.crawl(Article_crawler, start_url = start_url)
-            deferred.addBoth(lambda _: reactor.stop())
-            reactor.run()
-            q.put(None)
-        except Exception as e:
-            q.put(e)
-
-    q = Queue()
-    p = Process(target=f, args=(q,))
-    p.start()
-    result = q.get()
-    p.join()
-
-    if result is not None:
-        raise result
+    
+def launch():
+    
+    # Start accesible web launch process
+    wg = WebGenerator()
+    wg.launch()
 
 if __name__ == "__main__":
-   article = main("https://mashable.com/2018/04/28/facebook-fake-news-smaller-feed/#JMBs_1D1Paqs")
-   #print(article[0])
-   #print(article[1])
-   #print(article[2])
-   #WebGenerator.webGenerator(article[0],article[1],article[2])
-   #print(sys.argv[1])
-   #print("------")
-   article = main(sys.argv[1])
-   #print(article[0])
-   #print(article[1])
-   #print(article[2])
-   html_article = WebGenerator.webGenerator(article[0],article[1],article[2])
-   print(html_article)
+    
+    parser = argparse.ArgumentParser(description='Simplify text from a Mashable.com web page.')
+    parser.add_argument('url', type=str, help='URL of the web page')
+    args = parser.parse_args()
+    simplify(args.url)
+    launch() 
