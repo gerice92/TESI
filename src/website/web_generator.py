@@ -25,5 +25,6 @@ class WebGenerator(object):
         html_file.close()
         
         # Open URL in a new tab, if a browser window is already open.
-        webbrowser.open_new_tab('file://' + os.path.realpath("accesible_web.html"))
+        #webbrowser.open_new_tab('file://' + os.path.realpath("accesible_web.html"))
+        return page
         #webbrowser.close()

@@ -11,9 +11,15 @@ import webbrowser
 import unicodedata
 import json
 import os
+import sys
+
+from multiprocessing import Process, Queue
+from twisted.internet import reactor
+from scrapy.crawler import CrawlerRunner
 
 def main(start_url):
-    
+    global runner
+
     # Train/Test classifiers (Optional step)
     wc = WordClassifier()
     wc.train_classifier('naive-bayes')
@@ -25,8 +31,10 @@ def main(start_url):
         os.remove('article.json')
     except OSError:
         pass
-    CrawlingProcess.crawl(Article_crawler, start_url = start_url)
-    CrawlingProcess.start()
+    #CrawlingProcess.crawl(Article_crawler, start_url = start_url)
+    #CrawlingProcess.start()
+    
+    run_spider(start_url)
 
     # Read crawler output
     with open('article.json', encoding='utf-8', newline = "\n") as f:
@@ -40,7 +48,7 @@ def main(start_url):
         wc_result = wc.classify(line) # Classify words in line
         sr = SynonymReplace()
         sr_result = sr.word_swap(line, wc_result) # Replace complex with simple
-        new_sentences.append(sr_result)
+        new_sentences.append("<p>" + sr_result + "</p>")
 
     title = data["title"]
     img = data["img_url"]
@@ -49,9 +57,42 @@ def main(start_url):
     
     return article
 
+def get_html_article(start_url):
+    article = main(start_url)
+    html_article = WebGenerator.webGenerator(article[0],article[1],article[2])
+    return html_article
+
+def run_spider(start_url):
+    def f(q):
+        try:
+            runner = CrawlerRunner({'FEED_URI': 'file:article.json',})
+            deferred = runner.crawl(Article_crawler, start_url = start_url)
+            deferred.addBoth(lambda _: reactor.stop())
+            reactor.run()
+            q.put(None)
+        except Exception as e:
+            q.put(e)
+
+    q = Queue()
+    p = Process(target=f, args=(q,))
+    p.start()
+    result = q.get()
+    p.join()
+
+    if result is not None:
+        raise result
+
 if __name__ == "__main__":
    article = main("https://mashable.com/2018/04/28/facebook-fake-news-smaller-feed/#JMBs_1D1Paqs")
-   print(article[0])
-   print(article[1])
-   print(article[2])
-   WebGenerator.webGenerator(article[0],article[1],article[2])
+   #print(article[0])
+   #print(article[1])
+   #print(article[2])
+   #WebGenerator.webGenerator(article[0],article[1],article[2])
+   #print(sys.argv[1])
+   #print("------")
+   article = main(sys.argv[1])
+   #print(article[0])
+   #print(article[1])
+   #print(article[2])
+   html_article = WebGenerator.webGenerator(article[0],article[1],article[2])
+   print(html_article)

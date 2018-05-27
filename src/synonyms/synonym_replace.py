@@ -15,11 +15,14 @@ class SynonymReplace(object):
         vec -- array with [[complex_word_1,start,end],...]
         """
         new_phrase = phrase
+        open_div = '<span class="new_tooltip">'
+        close_div = '</span>'
 
         for vec_word in reversed(vec):
             word = vec_word[0].lower()
             start = vec_word[1]
             end = vec_word[2] - 1
+            tag_word = '<span class="new_tooltiptext">' + word +"</span>"
 
             synonyms = set()
             for ss in wn.synsets(word):
@@ -29,6 +32,5 @@ class SynonymReplace(object):
                 if word in synonyms:
                     synonyms.remove(word)
                 synonym = min(synonyms, key=len)
-                new_phrase = new_phrase[:start] + synonym + new_phrase[end+1:]                
-
+                new_phrase = new_phrase[:start] + open_div + synonym + tag_word + close_div  + new_phrase[end+1:]    
         return new_phrase

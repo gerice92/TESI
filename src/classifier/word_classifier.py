@@ -323,7 +323,6 @@ class WordClassifier(object):
         
         # Tokenize sentence
         tokens = word_tokenize(sentence)
-        
         spans = [span for span in TreebankWordTokenizer().span_tokenize(sentence)]
         token_pos = list()
         
