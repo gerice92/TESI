@@ -47,6 +47,8 @@ class MashableCrawler(object):
         return
     
     def retrieve(self, url):
+        with open(self.article_path, 'w') as article:
+            article.truncate(0)
         process = CrawlerProcess({'USER_AGENT': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)', 'FEED_URI': 'file:' + self.article_path})
         process.crawl(MashableSpider, url=url)
         process.start()

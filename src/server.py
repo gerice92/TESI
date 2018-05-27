@@ -1,6 +1,6 @@
 from bottle import route, request, run, template, os
 import subprocess
-from simplify_web import get_html_article
+from simplify_web import simplify
 
 @route('/hello')
 def index():
