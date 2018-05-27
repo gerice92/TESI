@@ -140,7 +140,7 @@ To reach every possible audience and to guarantee the extensibility of the archi
 
 \begin{itemize}
 	\item{\textbf{Command Line Interface (CLI)}: This interface is operated through a terminal window in a graphical user interface, receives the URL of the article to simplify and opens a web browser window with the simplified version of the web page. We provide a reference implementation which requires a Python 3 interpreter to be installed, along with some dependencies that are listed in appendix~\ref{sec:src}}.
-	\item{\textbf{Mozilla Firefox Extension}: This interface consists of a button embedded in the Mozilla Firefox web browser that, once clicked in the desired news page, loads a simplified version of the page highlighting the words that have been replaced. We provide a reference implementation of this Firefox Extension which requires some additional setup. In appendix~\ref{sec:mfx}, we provide further instruction.}
+	\item{\textbf{Google Chrome Extension}: This interface consists of a button embedded in the Google Chrome web browser that, once clicked in the desired news page, loads a simplified version of the page highlighting the words that have been replaced. We provide a reference implementation of this Chrome Extension which requires some additional setup. In appendix~\ref{sec:mfx}, we provide further instruction.}
 \end{itemize}
 
 In the following subsections, we provide more insight into the \emph{complex word identification algorithm} and the \emph{complex word replacement algorithm} that we have implemented.
@@ -211,7 +211,7 @@ The generated website must conform to the WCAG 2.0 guidelines~\cite{caldwell2008
 	\item{\textbf{AC Checker}~\footnote{https://achecker.ca/checker/index.php}: Online validator that allows checking a public URL, uploaded file or text input.}
 	\item{\textbf{A11Y Checker}~\footnote{https://github.com/Muhnad/a11y-checker}: Offline validator based on Node.js.}
 	\item{\textbf{Node WCAG}~\footnote{https://github.com/cfpb/node-wcag}: Another offline validator based on Node.js but only focused on WCAG criteria.}
-	\item{\textbf{WAVE Browser Extension}~\footnote{https://wave.webaim.org/extension/}: Extension for Google Chrome and Mozilla Firefox that visually highlights major issues over the webpage to evaluate.}
+	\item{\textbf{WAVE Browser Extension}~\footnote{https://wave.webaim.org/extension/}: Extension for Google Chrome and Google Chrome that visually highlights major issues over the webpage to evaluate.}
 \end{itemize}
 
 After a trial-and-error procedure, we ensured the WCAG 2.0 (AA) guidelines were satisfied while keeping the same look-and-feel of Mashable.com. This means the site has an acceptable degree of accessibility both in content, structure and style.
@@ -234,13 +234,13 @@ The proposed architecture only allows word simplification for now, but it may be
 
 The source code for the reference implementation is publicly available at \textbf{GitHub}~\footnote{https://github.com/gerice92/TESI} and will also be handed over with this paper.
 
-The \verb|README.md| Markdown text file contains the dependencies, structure and execution instructions for the source code.
+The \verb|README.md|Chrome Markdown text file contains the dependencies, structure and execution instructions for the source code.
 
 The \verb|doc/| directory contains the \LaTeX{} source used to build this PDF and the style files related to the NAACL HLT 2018 paper submission template. As it is an internal matter and its build is independent of every other piece of code, we do not provide instructions on how to compile it.
 
 The \verb|src/| directory contains the Python 3 source
 
-\section{Firefox Addon}
+\section{Chrome Addon}
 \label{sec:mfx}
 
 \end{document}
