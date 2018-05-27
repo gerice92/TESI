@@ -67,7 +67,7 @@ It is then worthwhile to review literature in search for good features that can 
 
 To that extend, the aim of this article is to \textbf{present an architecture that support the task of complex word simplification for a popular news website}. We chose Mashable.com for its entertainment and technology covering, topics that should mix both simple and complex vocabulary. After identification of complex words, we replace them with a simple alternative, so that the meaning prevails through the content. As the original site might contain elements that aren't accesible, we end the process by generating a web page derived from the original that keeps content but conforms to a well-known compendium of accessibility guidelines: \textbf{WCAG 2.0}~\cite{caldwell2008web}.
 
-The evaluation of this architecture is centered on the classification algorithm chosen for the identification task. As of the WCAG conformance, it is checked through a validation tool. We will discuss these issues on the \textbf{Results and Conclusion} sections of this paper.
+The evaluation of this architecture is centered on the classification algorithm chosen for the identification task. As of the WCAG conformance, it is checked through a validation tool. We will discuss these issues on section~\ref{sec:eval} of this paper.
 
 \section{Previous Work}
 
@@ -146,6 +146,7 @@ To reach every possible audience and to guarantee the extensibility of the archi
 In the following subsections, we provide more insight into the \emph{complex word identification algorithm} and the \emph{complex word replacement algorithm} that we have implemented.
 
 \subsection{Complex Word Classification Algorithm}
+\label{ssec:cwia}
 
 For word classification, a machine learning approach was chosen. Thus, we defined \textbf{10 features} based on our literature review. This features are:
 
@@ -158,7 +159,7 @@ For word classification, a machine learning approach was chosen. Thus, we define
 	\item{\textbf{Number of hypernyms}: A complex word might be so specific that its hypernym tree is huge, while a simple word tends to stay near the top of the tree.}
 \end{itemize}
 
-The election of a well-suited machine learning algorithm is one of the most critical decisions for the classifier. For this reason, we tested \textbf{three different algorithms} for evaluation:
+The election of a well-suited machine learning algorithm is one of the most critical decisions for the classifier: complex words should not be classified as simple, otherwise they will remain present in the transformed text. This also applies the other way round: simple words should not be classified as complex, or they may be replaced by a more complex alternative. For this reason, we tested the classification accuracy of \textbf{three different classification algorithms}, in order to keep the best one:
 
 \begin{itemize}
 	\item{\textbf{SVC}: C-Support Vector Classification~\cite{chang2011libsvm}.}
@@ -168,17 +169,60 @@ The election of a well-suited machine learning algorithm is one of the most crit
 
 Moving on to the data samples, we used a single dataset, from which we build \textbf{two different and statically-partitioned subsets}, one for \emph{training} and one for \emph{evaluation}. The only source for the data is Wikipedia, as it combines both simple and complex words. We make the dataset available to the public as well as the rest of the source code for the reference implementations (for further instructions, refer to appendix~\ref{sec:src}).
 
-In the reference implementations, we also used the \textbf{WordNet lexical database for English}~\cite{miller1995wordnet} to obtain the synsets and hypernyms for a word.
+In the reference implementations, we also used the \textbf{WordNet lexical database for English}~\cite{miller1995wordnet} to obtain the synsets and hypernyms for each word.
 
 \subsection{Complex Word Replacement Algorithm}
 
 We took a simple approach for the task of complex word replacement. This is the main weakness in the reference implementations and we expect future works to improve this situation.
 
-Without any evaluation of the part-of-speech (POS) –this means contextual information is ignored–, the \textbf{shortest synonym available} through WordNet is chosen.
+Without any evaluation of the part-of-speech (POS) –this means contextual information is ignored–, the \textbf{shortest synonym} available through WordNet is chosen.
 
 \section{Evaluation}
+\label{sec:eval}
 
-\section{Conclusions}
+\subsection{Classifier Performance}
+
+To evaluate the performance of each classification algorithm listed in section~\ref{ssec:cwia}, we trained each classifier with the training partition of the dataset and then classified the samples from its evaluation partition. 
+
+Then, having the output from the classifier, we build some statistics by comparing the expected class of each sample and the one assigned by the classifier (table~\ref{tab:eval}).
+
+\begin{table}
+	\centering
+	\small
+	\begin{tabular}{|l|l|l|l|l|}
+		\hline
+		{\bf Algorithm} & {\bf Accu.} & {\bf Prec.} & {\bf Rec.} & {\bf F}\\\hline
+		\verb|SVC| & {0.63} & {0.60} & {0.47} & {0.53} \\
+		\verb|RandomForest| & {0.68} & {0.65} & {0.60} & {0.62} \\
+		\verb|GaussianNB| & {0.70} & {0.65} & {0.68} & {0.66} \\\hline
+	\end{tabular}
+	\caption{Evaluation of the classifier output on the evaluation partition of the dataset}\label{tab:eval}
+\end{table}
+
+The results for the array of considered features show that the best classification algorithm is \textbf{GaussianNB}. Thus, we use it in our reference implementation.
+
+However, it is no match for other state-of-the-art classification techniques, like \textbf{SV000gg}~\cite{paetzold2016sv000gg}, with a precision of \textbf{0.78}~\cite{paetzold2016semeval} over a bigger dataset.
+
+\subsection{WCAG 2.0 Compliance}
+
+The generated website must conform to the WCAG 2.0 guidelines~\cite{caldwell2008web}. To check whether or not the web elements and structure satisfy its accesibility criteria, we used multiple online and offline validation tools:
+
+\begin{itemize}
+	\item{\textbf{AC Checker}~\footnote{https://achecker.ca/checker/index.php}: Online validator that allows checking a public URL, uploaded file or text input.}
+	\item{\textbf{A11Y Checker}~\footnote{https://github.com/Muhnad/a11y-checker}: Offline validator based on Node.js.}
+	\item{\textbf{Node WCAG}~\footnote{https://github.com/cfpb/node-wcag}: Another offline validator based on Node.js but only focused on WCAG criteria.}
+	\item{\textbf{WAVE Browser Extension}~\footnote{https://wave.webaim.org/extension/}: Extension for Google Chrome and Mozilla Firefox that visually highlights major issues over the webpage to evaluate.}
+\end{itemize}
+
+After a trial-and-error procedure, we ensured the WCAG 2.0 (AA) guidelines were satisfied while keeping the same look-and-feel of Mashable.com. This means the site has an acceptable degree of accessibility both in content, structure and style.
+
+\section{Conclusions and Future Work}
+
+In this paper, we presented a modular architecture to simplify a news website (Mashable.com). We also emphasized the value of text simplification, a field that is still under development.
+
+Our implementation of a \emph{complex word classifier} and a \emph{complex word replacer} are simple and are no match against more complex state-of-the-art alternatives, but they allowed us to test the proposed architecture. We chose the \emph{Gaussian Naive Bayes} classifier and the \emph{shortest synonym strategy} for each of them.
+
+The proposed architecture only allows word simplification for now, but it may be extended in the future to also support \textbf{whole-sentence simplification}. This means text from a sentence is reordered and restructured so that it is easier to read while keeping its meaning. As this issue is far more sophisticated and requires further natural language processing than complex word simplification, it will require new investigation and developments to emerge.
 
 \bibliography{tesi_articulo}
 \bibliographystyle{acl_natbib}
@@ -187,6 +231,14 @@ Without any evaluation of the part-of-speech (POS) –this means contextual info
 
 \section{Source Code}
 \label{sec:src}
+
+The source code for the reference implementation is publicly available at \textbf{GitHub}~\footnote{https://github.com/gerice92/TESI} and will also be handed over with this paper.
+
+The \verb|README.md| Markdown text file contains the dependencies, structure and execution instructions for the source code.
+
+The \verb|doc/| directory contains the \LaTeX{} source used to build this PDF and the style files related to the NAACL HLT 2018 paper submission template. As it is an internal matter and its build is independent of every other piece of code, we do not provide instructions on how to compile it.
+
+The \verb|src/| directory contains the Python 3 source
 
 \section{Firefox Addon}
 \label{sec:mfx}
