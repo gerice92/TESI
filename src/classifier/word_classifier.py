@@ -3,7 +3,7 @@
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import GaussianNB
-from sklearn.metrics import precision_recall_fscore_support
+from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 from sklearn.externals import joblib
 from nltk.corpus import wordnet
 from nltk.corpus import stopwords
@@ -288,8 +288,10 @@ class WordClassifier(object):
             # Precision, recall and f1 comparing expected classes with predicted classes
             bPrecis, bRecall, bFscore, bSupport = precision_recall_fscore_support(y_dev, predicted, average='binary')
             
+            bAccura = accuracy_score(y_dev, predicted)
+            
             # Print statistics
-            print(bPrecis, bRecall, bFscore, bSupport)
+            print("Acc: {:.2f}, P: {:.2f}, R: {:.2f}, F: {:.2f}".format(bAccura, bPrecis, bRecall, bFscore))
 
     def train_classifier(self, classifier):
         
