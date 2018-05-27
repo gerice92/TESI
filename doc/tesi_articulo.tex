@@ -140,7 +140,7 @@ To reach every possible audience and to guarantee the extensibility of the archi
 
 \begin{itemize}
 	\item{\textbf{Command Line Interface (CLI)}: This interface is operated through a terminal window in a graphical user interface, receives the URL of the article to simplify and opens a web browser window with the simplified version of the web page. We provide a reference implementation which requires a Python 3 interpreter to be installed, along with some dependencies that are listed in appendix~\ref{sec:src}}.
-	\item{\textbf{Google Chrome Extension}: This interface consists of a button embedded in the Google Chrome web browser that, once clicked in the desired news page, loads a simplified version of the page highlighting the words that have been replaced. We provide a reference implementation of this Chrome Extension which requires some additional setup. In appendix~\ref{sec:mfx}, we provide further instruction.}
+	\item{\textbf{Google Chrome Extension}: This interface consists of a button embedded in the Google Chrome web browser that, once clicked in the desired news page, loads a simplified version of the page highlighting the words that have been replaced. We provide a reference implementation of this Chrome Extension which requires some additional setup. In appendix~\ref{sec:src}, we provide further instruction.}
 \end{itemize}
 
 In the following subsections, we provide more insight into the \emph{complex word identification algorithm} and the \emph{complex word replacement algorithm} that we have implemented.
@@ -234,13 +234,10 @@ The proposed architecture only allows word simplification for now, but it may be
 
 The source code for the reference implementation is publicly available at \textbf{GitHub}~\footnote{https://github.com/gerice92/TESI} and will also be handed over with this paper.
 
-The \verb|README.md|Chrome Markdown text file contains the dependencies, structure and execution instructions for the source code.
+The \verb|README.md| Markdown text file contains the dependencies, structure and execution instructions for the source code.
 
-The \verb|doc/| directory contains the \LaTeX{} source used to build this PDF and the style files related to the NAACL HLT 2018 paper submission template. As it is an internal matter and its build is independent of every other piece of code, we do not provide instructions on how to compile it.
+The \verb|doc/| directory contains the \LaTeX{} source used to build this PDF and the style files related to the NAACL HLT 2018 paper submission template. As it is an internal document and its build is independent of every other piece of code, we do not provide instructions on how to compile it. Instead, we provide the PDF file for the latest compilation.
 
-The \verb|src/| directory contains the Python 3 source
-
-\section{Chrome Addon}
-\label{sec:mfx}
+The \verb|src/| directory contains the Python 3 source for every module. The script in \verb|src/simplify_web.py| launches the command line interface, while the script in \verb|src/server.py| acts as a web server that locally handles the requests from the Google Chrome Extension.
 
 \end{document}

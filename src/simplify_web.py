@@ -15,10 +15,10 @@ from website.web_generator import WebGenerator
 def simplify(url):
     """Return article segments from URL"""
 
-    # Train/Test classifiers (Optional step)
+    # Train/Test classifiers
     wc = WordClassifier()
-    wc.test_classifiers()
-    wc.train_classifier('naive-bayes')
+    #wc.test_classifiers() # Uncomment to test classifiers
+    #wc.train_classifier('naive-bayes') # Uncomment to train classifier
     
     # Start crawling process
     cr = MashableCrawler()
@@ -59,4 +59,4 @@ if __name__ == "__main__":
     parser.add_argument('url', type=str, help='URL of the web page')
     args = parser.parse_args()
     simplify(args.url)
-    launch() 
+    launch()
